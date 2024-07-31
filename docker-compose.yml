@@ -15,7 +15,6 @@ services:
     command: ["node", "./dist/src/main.js"]
     expose:
       - 8080
-
   nginx:
     container_name: nginx
     build: ./nginx
@@ -24,6 +23,20 @@ services:
       - 80:80
     depends_on:
       - api
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/certs:/etc/letsencrypt
+      - ./nginx/certs-data:/data/letsencrypt
+    networks:
+      - evolution-net
+
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    volumes:
+      - ./nginx/certs:/etc/letsencrypt
+      - ./nginx/certs-data:/data/letsencrypt
+    entrypoint: /bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'
     networks:
       - evolution-net
 
