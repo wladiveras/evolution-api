@@ -1,49 +1,52 @@
+version: "3"
+
 services:
-  api:
-    container_name: evolution
-    image: atendai/evolution-api:latest
+  evolution-api:
+    container_name: evolution_api
+    image: atendai/evolution-api
     restart: always
     ports:
-      - 8080:8080
+      - "8080:8080"
     env_file:
       - .env
     volumes:
-      - evolution_instances:/evolution/instances
       - evolution_store:/evolution/store
+      - evolution_instances:/evolution/instances
     networks:
       - evolution-net
-    command: ["node", "./dist/src/main.js"]
-    expose:
-      - 8080
-  nginx:
-    container_name: nginx
-    build: ./nginx
-    restart: always
-    ports:
-      - 80:80
-      - 443:443
-    depends_on:
-      - api
-    volumes:
-      - ./nginx/conf.d:/etc/nginx/conf.d
-      - ./nginx/certs:/etc/letsencrypt
-      - ./nginx/certs-data:/data/letsencrypt
-    networks:
-      - evolution-net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.api.rule=Host(`evolution.marinabot.com.br`)"
+      - "traefik.http.routers.api.entrypoints=websecure"
+      - "traefik.http.routers.api.tls.certresolver=myresolver"
+      - "traefik.http.services.api.loadbalancer.server.port=8080"
 
-  certbot:
-    image: certbot/certbot
-    container_name: certbot
+  traefik:
+    image: traefik:latest
+    container_name: traefik
+    restart: always
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      - "--certificatesresolvers.myresolver.acme.email=hi@wladi.com.br"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+      - "8081:8081"
     volumes:
-      - ./nginx/certs:/etc/letsencrypt
-      - ./nginx/certs-data:/data/letsencrypt
-    entrypoint: /bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "./letsencrypt:/letsencrypt"
     networks:
       - evolution-net
 
 volumes:
-  evolution_instances:
   evolution_store:
+  evolution_instances:
 
 networks:
   evolution-net:
