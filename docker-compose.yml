@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 services:
   evolution-api:
     container_name: evolution_api
@@ -15,4 +15,3 @@ services:
 volumes:
   evolution_store:
   evolution_instances:
-
