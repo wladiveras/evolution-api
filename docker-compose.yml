@@ -17,7 +17,14 @@ services:
     command: ["node", "./dist/src/main.js"]
     expose:
       - 8080
+  nginx:
+    container_name: nginx
+    build: ./nginx
+    ports:
+      - 80:80
 
+    depends_on:
+      - api
 volumes:
   evolution_instances:
   evolution_store:
