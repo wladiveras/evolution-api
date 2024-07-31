@@ -2,7 +2,7 @@ version: "3.3"
 
 services:
   api:
-    container_name: evolution_api
+    container_name: evolution
     image: atendai/evolution-api:latest
     restart: always
     ports:
