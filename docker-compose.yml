@@ -4,7 +4,7 @@ services:
     image: atendai/evolution-api
     restart: always
     ports:
-      - "8082:8080"
+      - "8080:8080"
     env_file:
       - .env
     volumes:
@@ -12,34 +12,34 @@ services:
       - evolution_instances:/evolution/instances
     networks:
       - evolution-net
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.api.rule=Host(`evolution.marinabot.com.br`)"
-      - "traefik.http.routers.api.entrypoints=websecure"
-      - "traefik.http.routers.api.tls.certresolver=myresolver"
-      - "traefik.http.services.api.loadbalancer.server.port=8080"
+    # labels:
+    #   - "traefik.enable=true"
+    #   - "traefik.http.routers.api.rule=Host(`evolution.marinabot.com.br`)"
+    #   - "traefik.http.routers.api.entrypoints=websecure"
+    #   - "traefik.http.routers.api.tls.certresolver=myresolver"
+    #   - "traefik.http.services.api.loadbalancer.server.port=8080"
 
-  traefik:
-    image: traefik:latest
-    container_name: traefik
-    restart: always
-    command:
-      - "--api.dashboard=true"
-      - "--providers.docker=true"
-      - "--entrypoints.web.address=:80"
-      - "--entrypoints.websecure.address=:443"
-      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
-      - "--certificatesresolvers.myresolver.acme.email=hi@wladi.com.br"
-      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
-    ports:
-      - "80:80"
-      - "443:443"
-      - "8081:8081"
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock"
-      - "./letsencrypt:/letsencrypt"
-    networks:
-      - evolution-net
+  # traefik:
+  #   image: traefik:latest
+  #   container_name: traefik
+  #   restart: always
+  #   command:
+  #     - "--api.dashboard=true"
+  #     - "--providers.docker=true"
+  #     - "--entrypoints.web.address=:80"
+  #     - "--entrypoints.websecure.address=:443"
+  #     - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+  #     - "--certificatesresolvers.myresolver.acme.email=hi@wladi.com.br"
+  #     - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #     - "8081:8081"
+  #   volumes:
+  #     - "/var/run/docker.sock:/var/run/docker.sock"
+  #     - "./letsencrypt:/letsencrypt"
+  #   networks:
+  #     - evolution-net
 
 volumes:
   evolution_store:
