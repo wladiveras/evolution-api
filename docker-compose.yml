@@ -1,7 +1,7 @@
 services:
   evolution-api:
     container_name: evolution_api
-    image: atendai/evolution-api
+    image: atendai/evolution-api:2.1.0
     restart: always
     ports:
       - "8020:8080"
